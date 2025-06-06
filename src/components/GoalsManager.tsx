@@ -16,49 +16,51 @@ import MonthSelector from "./MonthSelector";
 const GoalsManager: React.FC = () => {
   const { state, dispatch, getCurrentMonth } = useAppContext();
   const currentMonth = getCurrentMonth();
-
   const [showForm, setShowForm] = useState(false);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
+  const [targetAccountId, setTargetAccountId] = useState(
+    state.accounts[0]?.id || ""
+  );
   const [dueDate, setDueDate] = useState("");
 
-  // Calculate total savings from all savings accounts
+  // Calculate balance for a specific account
+  const calculateAccountBalance = (accountId: string): number => {
+    if (!currentMonth) return 0;
+
+    // Get starting balance
+    const startingBalance =
+      currentMonth.startingBalances.find((sb) => sb.accountId === accountId)
+        ?.amount || 0;
+
+    // Add income distributions
+    const incomeTotal = currentMonth.incomes.reduce((total, income) => {
+      const distribution = income.distributions.find(
+        (dist) => dist.accountId === accountId
+      );
+      return total + (distribution?.amount || 0);
+    }, 0);
+
+    // Subtract expenses
+    const expensesTotal = currentMonth.expenses.reduce((total, expense) => {
+      return expense.accountId === accountId ? total + expense.amount : total;
+    }, 0);
+
+    return startingBalance + incomeTotal - expensesTotal;
+  };
+
+  // Calculate total savings from all savings accounts (for display purposes)
   const calculateTotalSavings = (): number => {
     if (!currentMonth) return 0;
 
     const savingsAccounts = state.accounts.filter((acc) => acc.isSavings);
-    let totalSavings = 0;
-
-    savingsAccounts.forEach((account) => {
-      // Get starting balance
-      const startingBalance =
-        currentMonth.startingBalances.find((sb) => sb.accountId === account.id)
-          ?.amount || 0;
-
-      // Add income distributions
-      const incomeTotal = currentMonth.incomes.reduce((total, income) => {
-        const distribution = income.distributions.find(
-          (dist) => dist.accountId === account.id
-        );
-        return total + (distribution?.amount || 0);
-      }, 0);
-
-      // Subtract expenses
-      const expensesTotal = currentMonth.expenses.reduce((total, expense) => {
-        return expense.accountId === account.id
-          ? total + expense.amount
-          : total;
-      }, 0);
-
-      totalSavings += startingBalance + incomeTotal - expensesTotal;
-    });
-
-    return totalSavings;
+    return savingsAccounts.reduce((total, account) => {
+      return total + calculateAccountBalance(account.id);
+    }, 0);
   };
 
   const totalSavings = calculateTotalSavings();
-
   const handleAddGoal = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,6 +73,7 @@ const GoalsManager: React.FC = () => {
         id: editingGoalId,
         title,
         targetAmount: amount,
+        targetAccountId,
         dueDate,
         createdDate: new Date().toISOString(),
         isCompleted: false,
@@ -83,6 +86,7 @@ const GoalsManager: React.FC = () => {
         id: generateId("goal"),
         title,
         targetAmount: amount,
+        targetAccountId,
         dueDate,
         createdDate: new Date().toISOString(),
         isCompleted: false,
@@ -98,6 +102,7 @@ const GoalsManager: React.FC = () => {
     setEditingGoalId(goal.id);
     setTitle(goal.title);
     setTargetAmount(goal.targetAmount.toString());
+    setTargetAccountId(goal.targetAccountId);
     setDueDate(goal.dueDate);
     setShowForm(true);
   };
@@ -108,14 +113,19 @@ const GoalsManager: React.FC = () => {
     }
   };
   const handleCompleteGoal = (goal: Goal) => {
-    if (totalSavings < goal.targetAmount) {
-      alert("You don't have enough savings to complete this goal yet!");
+    const targetAccountBalance = calculateAccountBalance(goal.targetAccountId);
+    if (targetAccountBalance < goal.targetAmount) {
+      alert(
+        "You don't have enough balance in the target account to complete this goal yet!"
+      );
       return;
     }
 
-    const savingsAccount = state.accounts.find((acc) => acc.isSavings);
-    if (!savingsAccount) {
-      alert("Please create a savings account first!");
+    const targetAccount = state.accounts.find(
+      (acc) => acc.id === goal.targetAccountId
+    );
+    if (!targetAccount) {
+      alert("Target account not found!");
       return;
     }
 
@@ -139,16 +149,14 @@ const GoalsManager: React.FC = () => {
           color: "#9333ea", // Purple color for goals
         };
         categoryId = goalCategory.id;
-      }
-
-      // Create expense from savings account
+      } // Create expense from target account
       const expenseData: Expense = {
         id: generateId("expense"),
         amount: goal.targetAmount,
         description: `Goal completed: ${goal.title}`,
         date: new Date().toISOString(),
         categoryId: categoryId!,
-        accountId: savingsAccount.id,
+        accountId: targetAccount.id,
       };
 
       if (state.categories.some((cat) => cat.name.toLowerCase() === "goal")) {
@@ -166,17 +174,17 @@ const GoalsManager: React.FC = () => {
       }
     }
   };
-
   const resetForm = () => {
     setTitle("");
     setTargetAmount("");
+    setTargetAccountId(state.accounts[0]?.id || "");
     setDueDate("");
     setEditingGoalId(null);
     setShowForm(false);
   };
-
   const getProgressPercentage = (goal: Goal): number => {
-    return Math.min((totalSavings / goal.targetAmount) * 100, 100);
+    const targetAccountBalance = calculateAccountBalance(goal.targetAccountId);
+    return Math.min((targetAccountBalance / goal.targetAmount) * 100, 100);
   };
 
   const getDaysRemaining = (dueDate: string): number => {
@@ -224,7 +232,8 @@ const GoalsManager: React.FC = () => {
           </h2>
 
           <form onSubmit={handleAddGoal}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {" "}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Goal Title
@@ -262,6 +271,24 @@ const GoalsManager: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Target Account
+                </label>
+                <select
+                  value={targetAccountId}
+                  onChange={(e) => setTargetAccountId(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
+                  required
+                >
+                  {state.accounts.map((account) => (
+                    <option key={account.id} value={account.id}>
+                      {account.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Due Date
                 </label>
                 <input
@@ -273,7 +300,6 @@ const GoalsManager: React.FC = () => {
                 />
               </div>
             </div>
-
             <div className="flex justify-end space-x-2">
               <button
                 type="button"
@@ -289,6 +315,7 @@ const GoalsManager: React.FC = () => {
                   !title ||
                   !targetAmount ||
                   parseFloat(targetAmount) <= 0 ||
+                  !targetAccountId ||
                   !dueDate
                 }
               >
@@ -311,10 +338,17 @@ const GoalsManager: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {" "}
             {activeGoals.map((goal) => {
               const progress = getProgressPercentage(goal);
               const daysRemaining = getDaysRemaining(goal.dueDate);
-              const isGoalReached = totalSavings >= goal.targetAmount;
+              const targetAccountBalance = calculateAccountBalance(
+                goal.targetAccountId
+              );
+              const targetAccount = state.accounts.find(
+                (acc) => acc.id === goal.targetAccountId
+              );
+              const isGoalReached = targetAccountBalance >= goal.targetAmount;
 
               return (
                 <div
@@ -325,9 +359,12 @@ const GoalsManager: React.FC = () => {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800">
                         {goal.title}
-                      </h3>
+                      </h3>{" "}
                       <p className="text-sm text-gray-500">
                         Target: {formatCurrency(goal.targetAmount)}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        From: {targetAccount?.name || "Unknown Account"}
                       </p>
                     </div>
                     <div className="flex space-x-1">
@@ -362,9 +399,9 @@ const GoalsManager: React.FC = () => {
                         }`}
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       ></div>
-                    </div>
+                    </div>{" "}
                     <div className="flex justify-between mt-2 text-xs text-gray-500">
-                      <span>{formatCurrency(totalSavings)}</span>
+                      <span>{formatCurrency(targetAccountBalance)}</span>
                       <span>{formatCurrency(goal.targetAmount)}</span>
                     </div>
                   </div>

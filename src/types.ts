@@ -50,6 +50,7 @@ export interface Goal {
   id: string;
   title: string;
   targetAmount: number;
+  targetAccountId: string;
   dueDate: string;
   createdDate: string;
   isCompleted: boolean;
