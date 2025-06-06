@@ -46,9 +46,20 @@ export interface Month {
   }[];
 }
 
+export interface Goal {
+  id: string;
+  title: string;
+  targetAmount: number;
+  dueDate: string;
+  createdDate: string;
+  isCompleted: boolean;
+  completedDate?: string;
+}
+
 export interface AppState {
   accounts: Account[];
   categories: Category[];
   months: Month[];
   currentMonthId: string;
+  goals: Goal[];
 }

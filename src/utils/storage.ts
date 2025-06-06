@@ -93,6 +93,7 @@ const initializeAppState = (): AppState => {
     categories: defaultCategories,
     months: [initialMonth],
     currentMonthId: initialMonth.id,
+    goals: [],
   };
 };
 
@@ -101,7 +102,12 @@ export const loadData = (): AppState => {
   try {
     const savedData = localStorage.getItem(STORAGE_KEY);
     if (savedData) {
-      return JSON.parse(savedData);
+      const parsed = JSON.parse(savedData);
+      // Ensure backward compatibility by adding goals if missing
+      if (!parsed.goals) {
+        parsed.goals = [];
+      }
+      return parsed;
     }
     return initializeAppState();
   } catch (error) {

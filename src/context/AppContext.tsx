@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { AppState, Income, Expense, Account, Category, Month } from "../types";
+import { AppState, Income, Expense, Account, Category, Month, Goal } from "../types";
 import { loadData, saveData, createNextMonth } from "../utils/storage";
 
 // Define action types
@@ -21,7 +21,12 @@ type AppAction =
   | { type: "DELETE_CATEGORY"; payload: string }
   | { type: "CREATE_NEXT_MONTH" }
   | { type: "DELETE_INCOME"; payload: string }
-  | { type: "DELETE_EXPENSE"; payload: string };
+  | { type: "DELETE_EXPENSE"; payload: string }
+  | { type: "ADD_GOAL"; payload: Goal }
+  | { type: "UPDATE_GOAL"; payload: Goal }
+  | { type: "DELETE_GOAL"; payload: string }
+  | { type: "COMPLETE_GOAL"; payload: { goalId: string; expenseData: Expense } }
+  | { type: "COMPLETE_GOAL_WITH_CATEGORY"; payload: { goalId: string; expenseData: Expense; goalCategory: Category } };
 
 // Create the context
 interface AppContextType {
@@ -167,6 +172,81 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       return {
         ...state,
         months: updatedMonths,
+      };
+    }
+
+    case "ADD_GOAL":
+      return {
+        ...state,
+        goals: [...state.goals, action.payload],
+      };
+
+    case "UPDATE_GOAL":
+      return {
+        ...state,
+        goals: state.goals.map((goal) =>
+          goal.id === action.payload.id ? action.payload : goal
+        ),
+      };
+
+    case "DELETE_GOAL":
+      return {
+        ...state,
+        goals: state.goals.filter((goal) => goal.id !== action.payload),
+      };
+
+    case "COMPLETE_GOAL": {
+      const updatedGoals = state.goals.map((goal) =>
+        goal.id === action.payload.goalId
+          ? { ...goal, isCompleted: true, completedDate: new Date().toISOString() }
+          : goal
+      );
+
+      const updatedMonths = state.months.map((month) => {
+        if (month.id === state.currentMonthId) {
+          return {
+            ...month,
+            expenses: [...month.expenses, action.payload.expenseData],
+          };
+        }
+        return month;
+      });
+
+      return {
+        ...state,
+        goals: updatedGoals,
+        months: updatedMonths,
+      };
+    }
+
+    case "COMPLETE_GOAL_WITH_CATEGORY": {
+      const updatedGoals = state.goals.map((goal) =>
+        goal.id === action.payload.goalId
+          ? { ...goal, isCompleted: true, completedDate: new Date().toISOString() }
+          : goal
+      );
+
+      const updatedMonths = state.months.map((month) => {
+        if (month.id === state.currentMonthId) {
+          return {
+            ...month,
+            expenses: [...month.expenses, action.payload.expenseData],
+          };
+        }
+        return month;
+      });
+
+      const updatedCategories = [...state.categories];
+      const categoryExists = updatedCategories.some((cat) => cat.id === action.payload.goalCategory.id);
+      if (!categoryExists) {
+        updatedCategories.push(action.payload.goalCategory);
+      }
+
+      return {
+        ...state,
+        goals: updatedGoals,
+        months: updatedMonths,
+        categories: updatedCategories,
       };
     }
 

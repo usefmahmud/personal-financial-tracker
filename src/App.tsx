@@ -6,6 +6,7 @@ import IncomeManager from "./components/IncomeManager";
 import ExpenseManager from "./components/ExpenseManager";
 import AccountManager from "./components/AccountManager";
 import CategoryManager from "./components/CategoryManager";
+import GoalsManager from "./components/GoalsManager";
 
 function App() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -28,7 +29,6 @@ function App() {
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, []);
-
   // Render active component based on activeView
   const renderActiveView = () => {
     switch (activeView) {
@@ -40,6 +40,8 @@ function App() {
         return <AccountManager />;
       case "categories":
         return <CategoryManager />;
+      case "goals":
+        return <GoalsManager />;
       case "dashboard":
       default:
         return <Dashboard />;

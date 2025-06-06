@@ -7,6 +7,7 @@ import {
   DollarSign,
   CreditCard,
   Tag,
+  Target,
   Menu,
   X,
 } from "lucide-react";
@@ -73,14 +74,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <PieChart className="mr-3" size={20} />
                 Accounts
               </a>
-            </li>
-            <li>
+            </li>            <li>
               <a
                 href="#categories"
                 className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
               >
                 <Tag className="mr-3" size={20} />
                 Categories
+              </a>
+            </li>
+            <li>
+              <a
+                href="#goals"
+                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+              >
+                <Target className="mr-3" size={20} />
+                Goals
               </a>
             </li>
           </ul>
@@ -164,8 +173,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <PieChart className="mr-3" size={20} />
                   Accounts
                 </a>
-              </li>
-              <li>
+              </li>              <li>
                 <a
                   href="#categories"
                   className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
@@ -173,6 +181,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <Tag className="mr-3" size={20} />
                   Categories
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#goals"
+                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  onClick={toggleMobileMenu}
+                >
+                  <Target className="mr-3" size={20} />
+                  Goals
                 </a>
               </li>
             </ul>
