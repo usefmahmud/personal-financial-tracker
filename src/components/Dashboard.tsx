@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
 
   const totalIncome = getTotalMonthlyIncome(currentMonth);
   const totalExpenses = getTotalMonthlyExpenses(currentMonth);
-  const balance = totalIncome - totalExpenses;
+  const totalRemaining = totalIncome - totalExpenses;
 
   // Calculate account balances
   const accountBalances = new Map<string, number>();
@@ -52,6 +52,15 @@ const Dashboard: React.FC = () => {
     const current = accountBalances.get(expense.accountId) || 0;
     accountBalances.set(expense.accountId, current - expense.amount);
   });
+
+  // Calculate savings and balance (complementary)
+  const savingsAccount = state.accounts.find((acc) => acc.isSavings);
+  const savingsBalance = savingsAccount
+    ? accountBalances.get(savingsAccount.id) || 0
+    : 0;
+
+  // Balance is the remaining money excluding savings
+  const balance = totalRemaining - savingsBalance;
 
   // Prepare data for charts
   const accountData = {
@@ -86,12 +95,6 @@ const Dashboard: React.FC = () => {
       },
     ],
   };
-
-  // Calculate savings
-  const savingsAccount = state.accounts.find((acc) => acc.isSavings);
-  const savingsBalance = savingsAccount
-    ? accountBalances.get(savingsAccount.id) || 0
-    : 0;
 
   const chartOptions = {
     responsive: true,
