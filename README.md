@@ -46,3 +46,7 @@ A personal financial tracker I built with Bolt AI, because apparently I needed a
 
 - Save all financial data locally
 - Automatic loading of data when app starts
+
+## Upcoming Features
+
+- Goals: Set financial targets with title, amount, and due date that calculate required savings contributions automatically
