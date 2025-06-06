@@ -28,6 +28,14 @@ A personal financial tracker I built with Bolt AI, because apparently I needed a
 - Create and manage expense categories
 - Assign colors to categories for visual identification
 
+### 5. Goals Tracking
+
+- Set financial goals with target amounts and deadlines
+- Track progress towards savings and expense-reduction goals
+- Visual indicators for goal progress
+- Celebrate achievements when goals are reached
+- Categorize goals (short-term, long-term, emergency fund, etc.)
+
 ### 5. Month-to-Month Continuity
 
 - Automatic carry-over of remaining balances to the next month
@@ -46,7 +54,3 @@ A personal financial tracker I built with Bolt AI, because apparently I needed a
 
 - Save all financial data locally
 - Automatic loading of data when app starts
-
-## Upcoming Features
-
-- Goals: Set financial targets with title, amount, and due date that calculate required savings contributions automatically
