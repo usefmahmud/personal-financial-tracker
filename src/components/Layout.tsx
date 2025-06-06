@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import {
   PieChart,
@@ -19,12 +19,32 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { state } = useAppContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeView, setActiveView] = useState("dashboard");
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const currentMonth = state.months.find((m) => m.id === state.currentMonthId);
+
+  // Listen for hash changes to update the active view
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || "dashboard";
+      setActiveView(hash);
+    };
+
+    // Set initial view based on hash
+    handleHashChange();
+
+    // Add event listener
+    window.addEventListener("hashchange", handleHashChange);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -42,7 +62,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li>
               <a
                 href="#dashboard"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "dashboard"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <LayoutDashboard className="mr-3" size={20} />
                 Dashboard
@@ -51,7 +75,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li>
               <a
                 href="#income"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "income"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <DollarSign className="mr-3" size={20} />
                 Income
@@ -60,7 +88,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li>
               <a
                 href="#expenses"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "expenses"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <CreditCard className="mr-3" size={20} />
                 Expenses
@@ -69,15 +101,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li>
               <a
                 href="#accounts"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "accounts"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <PieChart className="mr-3" size={20} />
                 Accounts
               </a>
-            </li>            <li>
+            </li>{" "}
+            <li>
               <a
                 href="#categories"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "categories"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <Tag className="mr-3" size={20} />
                 Categories
@@ -86,7 +127,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li>
               <a
                 href="#goals"
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "goals"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
               >
                 <Target className="mr-3" size={20} />
                 Goals
@@ -137,7 +182,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <li>
                 <a
                   href="#dashboard"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "dashboard" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <LayoutDashboard className="mr-3" size={20} />
@@ -147,7 +194,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <li>
                 <a
                   href="#income"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "income" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <DollarSign className="mr-3" size={20} />
@@ -157,7 +206,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <li>
                 <a
                   href="#expenses"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "expenses" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <CreditCard className="mr-3" size={20} />
@@ -167,16 +218,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <li>
                 <a
                   href="#accounts"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "accounts" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <PieChart className="mr-3" size={20} />
                   Accounts
                 </a>
-              </li>              <li>
+              </li>{" "}
+              <li>
                 <a
                   href="#categories"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "categories"
+                      ? "bg-blue-50 text-blue-700"
+                      : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <Tag className="mr-3" size={20} />
@@ -186,7 +244,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <li>
                 <a
                   href="#goals"
-                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "goals" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
                   onClick={toggleMobileMenu}
                 >
                   <Target className="mr-3" size={20} />

@@ -3,7 +3,14 @@ import { useAppContext } from "../context/AppContext";
 import { formatCurrency } from "../utils/formatters";
 import { generateId } from "../utils/storage";
 import { Goal, Expense } from "../types";
-import { Plus, Target, Calendar, ShoppingCart, Trash2, Edit } from "lucide-react";
+import {
+  Plus,
+  Target,
+  Calendar,
+  ShoppingCart,
+  Trash2,
+  Edit,
+} from "lucide-react";
 import MonthSelector from "./MonthSelector";
 
 const GoalsManager: React.FC = () => {
@@ -39,7 +46,9 @@ const GoalsManager: React.FC = () => {
 
       // Subtract expenses
       const expensesTotal = currentMonth.expenses.reduce((total, expense) => {
-        return expense.accountId === account.id ? total + expense.amount : total;
+        return expense.accountId === account.id
+          ? total + expense.amount
+          : total;
       }, 0);
 
       totalSavings += startingBalance + incomeTotal - expensesTotal;
@@ -97,7 +106,8 @@ const GoalsManager: React.FC = () => {
     if (confirm("Are you sure you want to delete this goal?")) {
       dispatch({ type: "DELETE_GOAL", payload: id });
     }
-  };  const handleCompleteGoal = (goal: Goal) => {
+  };
+  const handleCompleteGoal = (goal: Goal) => {
     if (totalSavings < goal.targetAmount) {
       alert("You don't have enough savings to complete this goal yet!");
       return;
@@ -109,11 +119,19 @@ const GoalsManager: React.FC = () => {
       return;
     }
 
-    if (confirm(`Are you sure you want to buy "${goal.title}" for ${formatCurrency(goal.targetAmount)}?`)) {
+    if (
+      confirm(
+        `Are you sure you want to buy "${goal.title}" for ${formatCurrency(
+          goal.targetAmount
+        )}?`
+      )
+    ) {
       // Check if "Goal" category exists, create it if not
-      let goalCategory = state.categories.find((cat) => cat.name.toLowerCase() === "goal");
+      let goalCategory = state.categories.find(
+        (cat) => cat.name.toLowerCase() === "goal"
+      );
       let categoryId = goalCategory?.id;
-      
+
       if (!goalCategory) {
         goalCategory = {
           id: generateId("category"),
@@ -183,7 +201,10 @@ const GoalsManager: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Goals</h1>
           <p className="text-sm text-gray-600">
-            Total Savings: <span className="font-semibold text-green-600">{formatCurrency(totalSavings)}</span>
+            Total Savings:{" "}
+            <span className="font-semibold text-green-600">
+              {formatCurrency(totalSavings)}
+            </span>
           </p>
         </div>
 
@@ -264,7 +285,12 @@ const GoalsManager: React.FC = () => {
               <button
                 type="submit"
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-                disabled={!title || !targetAmount || parseFloat(targetAmount) <= 0 || !dueDate}
+                disabled={
+                  !title ||
+                  !targetAmount ||
+                  parseFloat(targetAmount) <= 0 ||
+                  !dueDate
+                }
               >
                 {editingGoalId ? "Update Goal" : "Save Goal"}
               </button>
@@ -279,7 +305,9 @@ const GoalsManager: React.FC = () => {
         {activeGoals.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <Target size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500">No active goals yet. Create your first goal to start saving!</p>
+            <p className="text-gray-500">
+              No active goals yet. Create your first goal to start saving!
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -295,7 +323,9 @@ const GoalsManager: React.FC = () => {
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{goal.title}</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {goal.title}
+                      </h3>
                       <p className="text-sm text-gray-500">
                         Target: {formatCurrency(goal.targetAmount)}
                       </p>
@@ -318,8 +348,12 @@ const GoalsManager: React.FC = () => {
 
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">Progress</span>
-                      <span className="text-sm text-gray-500">{progress.toFixed(1)}%</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Progress
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {progress.toFixed(1)}%
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -361,7 +395,8 @@ const GoalsManager: React.FC = () => {
 
                   {!isGoalReached && (
                     <div className="text-center text-sm text-gray-500">
-                      Need {formatCurrency(goal.targetAmount - totalSavings)} more
+                      Need {formatCurrency(goal.targetAmount - totalSavings)}{" "}
+                      more
                     </div>
                   )}
                 </div>
@@ -374,7 +409,9 @@ const GoalsManager: React.FC = () => {
       {/* Completed Goals */}
       {completedGoals.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-800">Completed Goals</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Completed Goals
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {completedGoals.map((goal) => (
               <div
@@ -383,7 +420,9 @@ const GoalsManager: React.FC = () => {
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{goal.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {goal.title}
+                    </h3>
                     <p className="text-sm text-gray-500">
                       {formatCurrency(goal.targetAmount)}
                     </p>
@@ -403,7 +442,9 @@ const GoalsManager: React.FC = () => {
                 </div>
 
                 <div className="text-center text-xs text-gray-400">
-                  Completed: {goal.completedDate && new Date(goal.completedDate).toLocaleDateString()}
+                  Completed:{" "}
+                  {goal.completedDate &&
+                    new Date(goal.completedDate).toLocaleDateString()}
                 </div>
               </div>
             ))}

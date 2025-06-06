@@ -5,7 +5,15 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { AppState, Income, Expense, Account, Category, Month, Goal } from "../types";
+import {
+  AppState,
+  Income,
+  Expense,
+  Account,
+  Category,
+  Month,
+  Goal,
+} from "../types";
 import { loadData, saveData, createNextMonth } from "../utils/storage";
 
 // Define action types
@@ -26,7 +34,10 @@ type AppAction =
   | { type: "UPDATE_GOAL"; payload: Goal }
   | { type: "DELETE_GOAL"; payload: string }
   | { type: "COMPLETE_GOAL"; payload: { goalId: string; expenseData: Expense } }
-  | { type: "COMPLETE_GOAL_WITH_CATEGORY"; payload: { goalId: string; expenseData: Expense; goalCategory: Category } };
+  | {
+      type: "COMPLETE_GOAL_WITH_CATEGORY";
+      payload: { goalId: string; expenseData: Expense; goalCategory: Category };
+    };
 
 // Create the context
 interface AppContextType {
@@ -198,7 +209,11 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case "COMPLETE_GOAL": {
       const updatedGoals = state.goals.map((goal) =>
         goal.id === action.payload.goalId
-          ? { ...goal, isCompleted: true, completedDate: new Date().toISOString() }
+          ? {
+              ...goal,
+              isCompleted: true,
+              completedDate: new Date().toISOString(),
+            }
           : goal
       );
 
@@ -222,7 +237,11 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
     case "COMPLETE_GOAL_WITH_CATEGORY": {
       const updatedGoals = state.goals.map((goal) =>
         goal.id === action.payload.goalId
-          ? { ...goal, isCompleted: true, completedDate: new Date().toISOString() }
+          ? {
+              ...goal,
+              isCompleted: true,
+              completedDate: new Date().toISOString(),
+            }
           : goal
       );
 
@@ -237,7 +256,9 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
       });
 
       const updatedCategories = [...state.categories];
-      const categoryExists = updatedCategories.some((cat) => cat.id === action.payload.goalCategory.id);
+      const categoryExists = updatedCategories.some(
+        (cat) => cat.id === action.payload.goalCategory.id
+      );
       if (!categoryExists) {
         updatedCategories.push(action.payload.goalCategory);
       }
