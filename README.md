@@ -36,13 +36,20 @@ A personal financial tracker I built with Bolt AI, because apparently I needed a
 - Celebrate achievements when goals are reached
 - Categorize goals (short-term, long-term, emergency fund, etc.)
 
-### 6. Month-to-Month Continuity
+### 6. Money Transfers
+
+- Transfer funds between accounts
+- Record transfer descriptions and dates
+- Track transfer history
+- Automatic balance updates for source and destination accounts
+
+### 7. Month-to-Month Continuity
 
 - Automatic carry-over of remaining balances to the next month
 - Historical view of past months' financial data
 - Create new months while preserving financial history
 
-### 7. Dashboard and Reporting
+### 8. Dashboard and Reporting
 
 - Summary of total income and expenses
 - Current balance across all accounts
@@ -50,7 +57,7 @@ A personal financial tracker I built with Bolt AI, because apparently I needed a
 - Visual charts for account balances and expense categories
 - Recent transaction history
 
-### 8. Data Persistence
+### 9. Data Persistence
 
 - Save all financial data locally
 - Automatic loading of data when app starts
