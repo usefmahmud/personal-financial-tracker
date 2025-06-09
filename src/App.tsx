@@ -7,6 +7,7 @@ import ExpenseManager from "./components/ExpenseManager";
 import AccountManager from "./components/AccountManager";
 import CategoryManager from "./components/CategoryManager";
 import GoalsManager from "./components/GoalsManager";
+import TransferManager from "./components/TransferManager";
 
 function App() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -36,6 +37,8 @@ function App() {
         return <IncomeManager />;
       case "expenses":
         return <ExpenseManager />;
+      case "transfers":
+        return <TransferManager />;
       case "accounts":
         return <AccountManager />;
       case "categories":

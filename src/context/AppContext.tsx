@@ -13,6 +13,7 @@ import {
   Category,
   Month,
   Goal,
+  Transfer,
 } from "../types";
 import { loadData, saveData, createNextMonth } from "../utils/storage";
 
@@ -21,6 +22,8 @@ type AppAction =
   | { type: "SET_CURRENT_MONTH"; payload: string }
   | { type: "ADD_INCOME"; payload: Income }
   | { type: "ADD_EXPENSE"; payload: Expense }
+  | { type: "ADD_TRANSFER"; payload: Transfer }
+  | { type: "DELETE_TRANSFER"; payload: string }
   | { type: "ADD_ACCOUNT"; payload: Account }
   | { type: "UPDATE_ACCOUNT"; payload: Account }
   | { type: "DELETE_ACCOUNT"; payload: string }
@@ -90,6 +93,47 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
           return {
             ...month,
             expenses: [...month.expenses, action.payload],
+          };
+        }
+        return month;
+      });
+
+      return {
+        ...state,
+        months: updatedMonths,
+      };
+    }
+
+    case "ADD_TRANSFER": {
+      const currentMonth = state.months.find(
+        (m) => m.id === state.currentMonthId
+      );
+      if (!currentMonth) return state;
+
+      const updatedMonths = state.months.map((month) => {
+        if (month.id === state.currentMonthId) {
+          return {
+            ...month,
+            transfers: [...(month.transfers || []), action.payload],
+          };
+        }
+        return month;
+      });
+
+      return {
+        ...state,
+        months: updatedMonths,
+      };
+    }
+
+    case "DELETE_TRANSFER": {
+      const updatedMonths = state.months.map((month) => {
+        if (month.id === state.currentMonthId) {
+          return {
+            ...month,
+            transfers: (month.transfers || []).filter(
+              (transfer) => transfer.id !== action.payload
+            ),
           };
         }
         return month;

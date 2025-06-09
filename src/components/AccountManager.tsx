@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { formatCurrency } from "../utils/formatters";
-import { generateId } from "../utils/storage";
+import { generateId, calculateEndingBalances } from "../utils/storage";
 import { Account } from "../types";
 import { Plus, Edit, Trash2, PiggyBank } from "lucide-react";
 import MonthSelector from "./MonthSelector";
@@ -15,30 +15,13 @@ const AccountManager: React.FC = () => {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#0466c8");
   const [isSavings, setIsSavings] = useState(false);
-
-  // Calculate current balances
+  // Calculate current balances using proper calculation that includes transfers
   const calculateAccountBalance = (accountId: string): number => {
     if (!currentMonth) return 0;
 
-    // Get starting balance
-    const startingBalance =
-      currentMonth.startingBalances.find((sb) => sb.accountId === accountId)
-        ?.amount || 0;
-
-    // Add income distributions
-    const incomeTotal = currentMonth.incomes.reduce((total, income) => {
-      const distribution = income.distributions.find(
-        (dist) => dist.accountId === accountId
-      );
-      return total + (distribution?.amount || 0);
-    }, 0);
-
-    // Subtract expenses
-    const expensesTotal = currentMonth.expenses.reduce((total, expense) => {
-      return expense.accountId === accountId ? total + expense.amount : total;
-    }, 0);
-
-    return startingBalance + incomeTotal - expensesTotal;
+    const endingBalances = calculateEndingBalances(currentMonth);
+    const balance = endingBalances.find((b) => b.accountId === accountId);
+    return balance ? balance.amount : 0;
   };
 
   const handleAddAccount = (e: React.FormEvent) => {

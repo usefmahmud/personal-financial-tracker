@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import {
   PieChart,
@@ -10,6 +10,7 @@ import {
   Target,
   Menu,
   X,
+  ArrowLeftRight,
 } from "lucide-react";
 
 interface LayoutProps {
@@ -84,7 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <DollarSign className="mr-3" size={20} />
                 Income
               </a>
-            </li>
+            </li>{" "}
             <li>
               <a
                 href="#expenses"
@@ -96,6 +97,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 <CreditCard className="mr-3" size={20} />
                 Expenses
+              </a>
+            </li>
+            <li>
+              <a
+                href="#transfers"
+                className={`flex items-center px-4 py-3  hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                  activeView === "transfers"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
+                }`}
+              >
+                <ArrowLeftRight className="mr-3" size={20} />
+                Transfers
               </a>
             </li>
             <li>
@@ -202,7 +216,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <DollarSign className="mr-3" size={20} />
                   Income
                 </a>
-              </li>
+              </li>{" "}
               <li>
                 <a
                   href="#expenses"
@@ -213,6 +227,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <CreditCard className="mr-3" size={20} />
                   Expenses
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#transfers"
+                  className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors ${
+                    activeView === "transfers" ? "bg-blue-50 text-blue-700" : ""
+                  }`}
+                  onClick={toggleMobileMenu}
+                >
+                  <ArrowLeftRight className="mr-3" size={20} />
+                  Transfers
                 </a>
               </li>
               <li>

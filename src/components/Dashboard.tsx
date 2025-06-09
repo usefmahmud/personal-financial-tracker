@@ -4,6 +4,7 @@ import { formatCurrency } from "../utils/formatters";
 import {
   getTotalMonthlyIncome,
   getTotalMonthlyExpenses,
+  calculateEndingBalances,
 } from "../utils/storage";
 import MonthSelector from "./MonthSelector";
 import { Doughnut } from "react-chartjs-2";
@@ -26,31 +27,16 @@ const Dashboard: React.FC = () => {
   if (!currentMonth) {
     return <div>No month data available</div>;
   }
-
   const totalIncome = getTotalMonthlyIncome(currentMonth);
   const totalExpenses = getTotalMonthlyExpenses(currentMonth);
   const totalRemaining = totalIncome - totalExpenses;
 
-  // Calculate account balances
+  // Calculate account balances using the proper calculation that includes transfers
+  const endingBalances = calculateEndingBalances(currentMonth);
   const accountBalances = new Map<string, number>();
 
-  // Set starting balances
-  currentMonth.startingBalances.forEach(({ accountId, amount }) => {
+  endingBalances.forEach(({ accountId, amount }) => {
     accountBalances.set(accountId, amount);
-  });
-
-  // Add income distributions
-  currentMonth.incomes.forEach((income) => {
-    income.distributions.forEach((dist) => {
-      const current = accountBalances.get(dist.accountId) || 0;
-      accountBalances.set(dist.accountId, current + dist.amount);
-    });
-  });
-
-  // Subtract expenses
-  currentMonth.expenses.forEach((expense) => {
-    const current = accountBalances.get(expense.accountId) || 0;
-    accountBalances.set(expense.accountId, current - expense.amount);
   });
 
   // Calculate savings and balance (complementary)

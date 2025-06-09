@@ -46,12 +46,13 @@ const createNewMonth = (previousMonth?: Month): Month => {
     month,
     incomes: [],
     expenses: [],
+    transfers: [],
     startingBalances,
   };
 };
 
 // Calculate ending balances for a month
-const calculateEndingBalances = (
+export const calculateEndingBalances = (
   month: Month
 ): { accountId: string; amount: number }[] => {
   const balances = new Map<string, number>();
@@ -71,12 +72,24 @@ const calculateEndingBalances = (
       );
     });
   });
-
   // Subtract expenses
   month.expenses.forEach((expense) => {
     const currentBalance = balances.get(expense.accountId) || 0;
     balances.set(expense.accountId, currentBalance - expense.amount);
   });
+
+  // Handle transfers
+  if (month.transfers) {
+    month.transfers.forEach((transfer) => {
+      // Subtract from source account
+      const fromBalance = balances.get(transfer.fromAccountId) || 0;
+      balances.set(transfer.fromAccountId, fromBalance - transfer.amount);
+
+      // Add to destination account
+      const toBalance = balances.get(transfer.toAccountId) || 0;
+      balances.set(transfer.toAccountId, toBalance + transfer.amount);
+    });
+  }
 
   return Array.from(balances.entries()).map(([accountId, amount]) => ({
     accountId,

@@ -33,6 +33,15 @@ export interface Income {
   }[];
 }
 
+export interface Transfer {
+  id: string;
+  amount: number;
+  description: string;
+  date: string;
+  fromAccountId: string;
+  toAccountId: string;
+}
+
 export interface Month {
   id: string;
   name: string;
@@ -40,6 +49,7 @@ export interface Month {
   month: number; // 0-11
   incomes: Income[];
   expenses: Expense[];
+  transfers: Transfer[]; // Add transfers array
   startingBalances: {
     accountId: string;
     amount: number;
